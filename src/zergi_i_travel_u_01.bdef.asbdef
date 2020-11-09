@@ -1,0 +1,68 @@
+unmanaged; // implementation in class zbp_ergi_i_travel_u_01 unique; <= Ho asterisquem ja que volem una implementació per cada entity
+                                                                      //i NO una implelmentació global per totes les entities!!!
+
+define behavior for ZERGI_I_TRAVEL_U_01 alias Travel
+implementation in class zbp_ergi_i_travel_u_01 unique   //Ho posem aquí
+
+lock master
+etag master Lastchangedat
+{
+  create;
+  update;
+  delete;
+  association _Booking { create; }
+
+  field ( read only ) TravelID;
+  field ( mandatory ) AgencyID, CustomerID, BeginDate, EndDate;
+
+  //Afegim el mapping entre la CDS i els camps de la Funció/Bapi que usarem per CRUD
+   mapping for /DMO/TRAVEL control zssergi_travel_x_01 //Estructura que creem per fer el mapping
+  {
+    TravelId = travel_id;
+    AgencyId = AGENCY_ID;
+    CustomerId = CUSTOMER_ID;
+    BeginDate = BEGIN_DATE;
+    EndDate = END_DATE;
+    BookingFee = BOOKING_FEE;
+    TotalPrice = TOTAL_PRICE;
+    CurrencyCode = CURRENCY_CODE;
+    Description = DESCRIPTION;
+    Status = STATUS;
+    Createdby = CREATEDBY;
+    Createdat = CREATEDAT;
+    Lastchangedby = LASTCHANGEDBY;
+    Lastchangedat = LASTCHANGEDAT;
+  }
+
+}
+
+define behavior for ZSERGI_I_BOOKING_U_01 alias Booking
+implementation in class zbp_ergi_i_booking_u_01 unique
+
+lock dependent by _Travel
+etag dependent by _Travel
+{
+//  create;   Asteriqeum ja que volem que es creÏn bookings sols per el root Travel
+  update;
+  delete;
+
+  association _Travel;
+
+  field ( read only ) TravelID, BookingID;
+  field ( mandatory ) BookingDate, CustomerID, CarrierId, ConnectionID, FlightDate;
+
+  //Afegim el mapping entre la CDS i els camps de la Funció/Bapi que usarem per CRUD
+   mapping for /DMO/BOOKING control zssergi_booking_x_01 //Estructura que creem per fer el mapping
+  {
+    TravelId = TRAVEL_ID;
+    BookingId = BOOKING_ID;
+    BookingDate = BOOKING_DATE;
+    CustomerId = CUSTOMER_ID;
+    CarrierId = CARRIER_ID;
+    ConnectionId = CONNECTION_ID;
+    FlightDate = FLIGHT_DATE;
+    FlightPrice = FLIGHT_PRICE;
+    CurrencyCode = CURRENCY_CODE;
+  }
+
+}
